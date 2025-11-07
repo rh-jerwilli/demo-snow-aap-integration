@@ -35,12 +35,12 @@
             size: "{{ disk_size_gb }}Gi"
             storageclass: ocs-external-storagecluster-ceph-rbd-immediate   # adjust as needed
         running: true
-        cloud_init:
-          user: cloud-user
-          password: redhat
-          ssh_pwauth: true
-          runcmd:
-            - echo "Provisioned via Ansible & SNOW Spoke" > /etc/motd
+        #cloud_init:
+          #user: cloud-user
+          #password: redhat
+          #ssh_pwauth: true
+          #runcmd:
+           # - echo "Provisioned via Ansible & SNOW Spoke" > /etc/motd
 
     - name: Wait for VM to be ready
       redhat.openshift_virtualization.kubevirt_vm_info:
