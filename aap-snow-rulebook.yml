@@ -1,0 +1,19 @@
+- name: Watch for new records
+  hosts: localhost
+  sources:
+  
+    - name: Watch for records using sys_created_on
+      servicenow.itsm.records:
+        instance:
+          host: https://ven05430.service-now.com
+          username: {{ snow_username }}
+          password: {{ snow_password }}
+        table: some_table_without_updated_on
+        timestamp_field: sys_created_on
+        interval: 10
+
+  rules:
+    - name: New record created
+      condition: event.sys_id is defined
+      action:
+        debug:
