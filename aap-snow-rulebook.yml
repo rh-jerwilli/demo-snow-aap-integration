@@ -1,13 +1,13 @@
 - name: Watch for new records
-  hosts: localhost
+  hosts: all
   sources:
   
     - name: Watch for records using sys_created_on
       servicenow.itsm.records:
         instance:
           host: https://ven05430.service-now.com
-          username: {{ snow_username }}
-          password: {{ snow_password }}
+          username: "{{ snow_username }}"
+          password: "{{ snow_password }}"
         table: some_table_without_updated_on
         timestamp_field: sys_created_on
         interval: 10
@@ -16,4 +16,6 @@
     - name: New record created
       condition: event.sys_id is defined
       action:
-        debug:
+        run_job_template:
+          name: "{{ jobTemplate }}"
+          organization: "{{ org }}"
