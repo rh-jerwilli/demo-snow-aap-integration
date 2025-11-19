@@ -1,5 +1,5 @@
 - name: Watch for new records
-  hosts: all
+  hosts: localhost
   sources:
   
     - name: Watch for records using sys_created_on
