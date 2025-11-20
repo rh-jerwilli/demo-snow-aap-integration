@@ -26,7 +26,7 @@
           snow_incident_short_description: "{{ event.record.short_description }}"
 
     - name: Dump event for debug
-      condition: event is defined
+      condition: true
       action:
         debug:
           msg: "{{ event }}"
