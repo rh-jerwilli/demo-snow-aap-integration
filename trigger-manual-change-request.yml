@@ -10,13 +10,9 @@
           host: "{{ SN_HOST }}"
           username: "{{ SN_USERNAME }}"
           password: "{{ SN_PASSWORD }}"
-
-    - name: 'Create change request for resolving a problem'
-      servicenow.itsm.change_request:
         state: new
-        type: standard
-        short_description: Demo change request
-        template: Clear BGP sessions on a Cisco router - 1
-#        other:
-#          parent: "{{ problem.record.sys_id }}"
-      register: change
+        caller: some.user
+        short_description: User is not receiving email
+        description: User has been unable to receive email for the past 15 minutes
+        impact: low
+        urgency: low

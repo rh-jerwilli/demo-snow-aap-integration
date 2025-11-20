@@ -8,7 +8,7 @@
           host: "{{ SN_HOST }}"
           username: "{{ SN_USERNAME }}"
           password: "{{ SN_PASSWORD }}"
-        table: change_request
+        table: incident
         remote_servicenow_timezone: UTC
         timestamp_field: sys_created_on
         interval: 10
