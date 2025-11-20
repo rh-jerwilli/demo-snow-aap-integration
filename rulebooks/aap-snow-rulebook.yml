@@ -24,3 +24,9 @@
           snow_incident_sys_id: "{{ event.record.sys_id }}"
           snow_incident_number: "{{ event.record.number }}"
           snow_incident_short_description: "{{ event.record.short_description }}"
+
+    - name: Dump event for debug
+      condition: event is defined
+      action:
+        debug:
+          msg: "{{ event }}"
