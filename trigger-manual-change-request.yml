@@ -1,0 +1,22 @@
+---
+- name: Create a change request to trigger EDA Polling
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Create a new incident
+      servicenow.itsm.incident:
+        instance:
+          host: "{{ SN_HOST }}"
+          username: "{{ SN_USERNAME }}"
+          password: "{{ SN_PASSWORD }}"
+
+    - name: Create change request for resolving a problem
+      servicenow.itsm.change_request:
+        state: new
+        type: standard
+        short_description: Demo change request
+        template: Clear BGP sessions on a Cisco router - 1
+        other:
+          parent: "{{ problem.record.sys_id }}"
+      register: change
