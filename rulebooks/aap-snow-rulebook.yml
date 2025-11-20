@@ -9,6 +9,7 @@
           username: "{{ snow_username }}"
           password: "{{ snow_password }}"
         table: incedent_table
+        remote_servicenow_timezone: UTC
         timestamp_field: sys_created_on
         interval: 10
 
