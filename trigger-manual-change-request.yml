@@ -17,6 +17,6 @@
         type: standard
         short_description: Demo change request
         template: Clear BGP sessions on a Cisco router - 1
-        other:
-          parent: "{{ problem.record.sys_id }}"
+#        other:
+#          parent: "{{ problem.record.sys_id }}"
       register: change
