@@ -9,14 +9,18 @@
           username: "{{ SN_USERNAME }}"
           password: "{{ SN_PASSWORD }}"
         table: incident
-        remote_servicenow_timezone: UTC
+        remote_servicenow_timezone: ETC
         timestamp_field: sys_created_on
         interval: 10
 
   rules:
     - name: New record created
-      condition: event.sys_id is defined
+      condition: event.record.sys_id is defined
       action:
         run_job_template:
-          name: "{{ jobTemplate }}"
-          organization: "{{ org }}"
+        name: "{{ jobTemplate }}"
+        organization: "{{ org }}"
+        extra_vars:
+          snow_incident_sys_id: "{{ event.record.sys_id }}"
+          snow_incident_number: "{{ event.record.number }}"
+          snow_incident_short_description: "{{ event.record.short_description }}"

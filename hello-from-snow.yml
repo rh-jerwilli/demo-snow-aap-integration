@@ -2,4 +2,7 @@
   hosts: localhost
   tasks:
     - debug:
-        msg: "Hello from ServiceNow!"
+        msg: >
+          Hello from EDA. New incident {{ snow_incident_number }}
+          (sys_id={{ snow_incident_sys_id }}):
+          {{ snow_incident_short_description }}

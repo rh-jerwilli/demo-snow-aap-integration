@@ -16,3 +16,4 @@
         description: User has been unable to receive email for the past 15 minutes
         impact: low
         urgency: low
+      register: incident
