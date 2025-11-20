@@ -1,2 +1,3 @@
 collections:
-  -name: servicenow.itsm
+  - name: servicenow.itsm
+    verion: "2.13.2"
