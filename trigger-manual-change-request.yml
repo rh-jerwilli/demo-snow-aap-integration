@@ -11,7 +11,7 @@
           username: "{{ SN_USERNAME }}"
           password: "{{ SN_PASSWORD }}"
 
-    - name: "Create change request for resolving a problem"
+    - name: "Create change request for resolving a \problem"
       servicenow.itsm.change_request:
         state: new
         type: standard
