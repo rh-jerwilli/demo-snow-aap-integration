@@ -9,7 +9,7 @@
           username: "{{ SN_USERNAME }}"
           password: "{{ SN_PASSWORD }}"
         table: incident
-        remote_servicenow_timezone: ETC
+        remote_servicenow_timezone: EST
         timestamp_field: sys_created_on
         interval: 10
 
