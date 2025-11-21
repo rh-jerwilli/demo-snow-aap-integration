@@ -18,12 +18,13 @@
       condition: event.sys_id is defined
       action:
         run_job_template:
-        name: "{{ jobTemplate }}"
-        organization: "{{ org }}"
+        name: "hello_from_snow"
+        organization: "Default"
         extra_vars:
           snow_incident_sys_id: "{{ event.sys_id }}"
           snow_incident_number: "{{ event.number }}"
           snow_incident_short_description: "{{ event.short_description }}"
+          message_content: "{{ event.payload.message }}"
 
     - name: Dump event for debug
       condition: true
