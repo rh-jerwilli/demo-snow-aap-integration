@@ -21,9 +21,9 @@
         name: "{{ jobTemplate }}"
         organization: "{{ org }}"
         extra_vars:
-          snow_incident_sys_id: "{{ event.record.sys_id }}"
-          snow_incident_number: "{{ event.record.number }}"
-          snow_incident_short_description: "{{ event.record.short_description }}"
+          snow_incident_sys_id: "{{ event.sys_id }}"
+          snow_incident_number: "{{ event.number }}"
+          snow_incident_short_description: "{{ event.short_description }}"
 
     - name: Dump event for debug
       condition: true
