@@ -1,58 +1,19 @@
 ---
-- name: Deploy RHEL9 VM using redhat.openshift_virtualization
-  hosts: localhost
-  gather_facts: false
-
-  vars:
-    vm_name: rhel9-demo
-    namespace: vms
-    template_name: rhel9-server-medium             # must exist in target namespace
-    flavor: medium                        # optional - small|medium|large|xlarge
-    flavor_map:
-      small:   { cpu: 2, memory: 4, storage: 40 }
-      medium:  { cpu: 4, memory: 8, storage: 80 }
-      large:   { cpu: 8, memory: 16, storage: 160 }
-      xlarge:  { cpu: 16, memory: 32, storage: 320 }
+- name: Create a basic rhel vm
+  hosts: all
+  gather_facts: true
 
   tasks:
-    - name: Derive sizing from flavor
-      set_fact:
-        cpu_cores:   "{{ flavor_map[flavor].cpu }}"
-        memory_gb:   "{{ flavor_map[flavor].memory }}"
-        disk_size_gb: "{{ flavor_map[flavor].storage }}"
-
-    - name: Create a new VM from existing RHEL9 template
+    - name: Create a VirtualMachine
       redhat.openshift_virtualization.kubevirt_vm:
         state: present
         name: "{{ vm_name }}"
-        namespace: "{{ namespace }}"
-        template: "{{ template_name }}"
-        cpu_cores: "{{ cpu_cores }}"
-        memory: "{{ memory_gb }}Gi"
-        disks:
-          - name: rootdisk
-            bootorder: 1
-            size: "{{ disk_size_gb }}Gi"
-            storageclass: ocs-external-storagecluster-ceph-rbd-immediate   # adjust as needed
-        running: true
-        #cloud_init:
-          #user: cloud-user
-          #password: redhat
-          #ssh_pwauth: true
-          #runcmd:
-           # - echo "Provisioned via Ansible & SNOW Spoke" > /etc/motd
-
-    - name: Wait for VM to be ready
-      redhat.openshift_virtualization.kubevirt_vm_info:
-        name: "{{ vm_name }}"
-        namespace: "{{ namespace }}"
-      register: vm_info
-      until: vm_info.resources | length > 0 and vm_info.resources[0].status.printableStatus == "Running"
-      retries: 30
-      delay: 10
-
-    - name: Display VM info
-      debug:
-        msg:
-          - "VM {{ vm_name }} is now {{ vm_info.resources[0].status.printableStatus }}"
-          - "Node: {{ vm_info.resources[0].status.nodeName | default('N/A') }}"
+        namespace: "{{ vm_namespace }}"
+        labels:
+          app: test
+        instancetype:
+          name: "{{ vm_instance_type }}"
+        preference:
+          name: fedora
+        spec:
+          name: default

@@ -1,6 +1,0 @@
-- name: Hello
-  hosts: localhost
-  tasks:
-    - debug:
-        msg: >
-          Hello from EDA. New incident {{ snow_incident_number }}
