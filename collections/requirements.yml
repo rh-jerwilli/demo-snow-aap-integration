@@ -1,2 +1,2 @@
-collections:
+roles:
   - name: RedHatOfficial.rhel9_stig
