@@ -1,7 +1,7 @@
 collections:
   - name: community.general
-    version: "latest"
+    #version: "latest"
   - name: community.posix
-    version: "latest"
+    #version: "latest"
   - name: RedHatOfficial.rhel9_stig
-    version: "latest"
+    #version: "latest"
