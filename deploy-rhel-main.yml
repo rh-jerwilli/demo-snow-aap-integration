@@ -1,4 +1,3 @@
----
 - name: Create a basic rhel vm
   hosts: all
   gather_facts: true
@@ -16,4 +15,7 @@
         preference:
           name: fedora
         spec:
-          name: default
+          domain:
+            devices:
+              - name: default
+                masquerade: {}
