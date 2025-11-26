@@ -41,4 +41,11 @@
                       storage: 30Gi    # or whatever size you want
                   accessModes:
                     - ReadWriteOnce
+        networks:
+          - name: default
+            pod: {}
+        volumes:
+          - name: rootdisk
+            dataVolume:
+              name: rootdisk
         running: true
