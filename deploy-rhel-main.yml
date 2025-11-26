@@ -13,7 +13,7 @@
         instancetype:
           name: "{{ vm_instance_type }}"
         preference:
-          name: fedora
+          name: "{{ vm_preference_os }}"
         spec:
           domain:
             devices:
@@ -27,6 +27,18 @@
           networks:
             - name: default
               pod: {}
+          dataVolumeTemplates:
+            - metadata:
+                name: rootdisk
+              spec:
+                sourceRef:
+                  kind: DataSource
+                  name: rhel9
+                  namespace: openshift-virtualization-os-images
+                storage:
+                  resources:
+                    requests:
+                      storage: 30Gi    # or whatever size you want
+                  accessModes:
+                    - ReadWriteOnce
         running: true
-
-        
