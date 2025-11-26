@@ -10,8 +10,8 @@
         namespace: "{{ vm_namespace }}"
         labels:
           app: "{{ vm_app_label }}"
-        preference:
-          name: "{{vm_preference_os}}"
+        #preference:
+          #name: "{{vm_preference_os}}"
         data_volume_templates:
           - metadata:
               name: rootdisk
