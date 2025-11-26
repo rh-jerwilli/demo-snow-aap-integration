@@ -1,0 +1,45 @@
+---
+- name: Create a basic rhel vm
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Create VM on OpenShift Virtualization
+      redhat.openshift_virtualization.kubevirt_vm:
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        labels:
+          app: "{{ vm_app_label }}"
+        preference:
+          name: "{{vm_preference_os}}"
+        data_volume_templates:
+          - metadata:
+              name: rootdisk
+            spec:
+              sourceRef:
+                kind: DataSource
+                name: rhel9
+                namespace: openshift-virtualization-os-images
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 30Gi
+            data_volume_templates.spec:
+              domain:
+                devices:
+                  interfaces:
+                    - name: default
+                      masquerade: {}
+                  disks:
+                    - name: rootdisk
+                      disk:
+                        bus: virtio
+                  networks:
+                    - name: default
+                      pod: {}
+                  volumes:
+                    - name: rootdisk
+                      dataVolume:
+                        name: rootdisk
