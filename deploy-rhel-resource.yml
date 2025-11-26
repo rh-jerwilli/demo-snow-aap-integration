@@ -26,20 +26,20 @@
                 resources:
                   requests:
                     storage: 30Gi
-            data_volume_templates.spec:
-              domain:
-                devices:
-                  interfaces:
-                    - name: default
-                      masquerade: {}
-                  disks:
-                    - name: rootdisk
-                      disk:
-                        bus: virtio
-                  networks:
-                    - name: default
-                      pod: {}
-                  volumes:
-                    - name: rootdisk
-                      dataVolume:
-                        name: rootdisk
+        spec:
+          domain:
+            devices:
+              interfaces:
+                - name: default
+                  masquerade: {}
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: rootdisk   
