@@ -45,3 +45,5 @@
             - name: rootdisk
               dataVolume:
                 name: rootdisk
+        running: true
+        wait: true
