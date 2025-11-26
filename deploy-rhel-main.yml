@@ -33,7 +33,7 @@
               spec:
                 sourceRef:
                   kind: DataSource
-                  name: rhel9
+                  name: "{{ vm_preference_os }}"
                   namespace: openshift-virtualization-os-images
                 storage:
                   resources:
@@ -41,11 +41,4 @@
                       storage: 30Gi    # or whatever size you want
                   accessModes:
                     - ReadWriteOnce
-        networks:
-          - name: default
-            pod: {}
-        volumes:
-          - name: rootdisk
-            dataVolume:
-              name: rootdisk
         running: true
