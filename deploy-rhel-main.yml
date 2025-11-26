@@ -17,5 +17,16 @@
         spec:
           domain:
             devices:
-              - name: default
-                masquerade: {}
+              interfaces:
+                - name: default
+                  masquerade: {}
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+          networks:
+            - name: default
+              pod: {}
+        running: true
+
+        
