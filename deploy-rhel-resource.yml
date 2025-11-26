@@ -10,15 +10,13 @@
         namespace: "{{ vm_namespace }}"
         labels:
           app: "{{ vm_app_label }}"
-        # preference:
-          # name: "{{vm_preference_os}}"
         data_volume_templates:
           - metadata:
               name: rootdisk
             spec:
               sourceRef:
                 kind: DataSource
-                name: rhel9
+                name: "{{ vm_preference_os }}"
                 namespace: openshift-virtualization-os-images
               storage:
                 accessModes:
@@ -28,6 +26,10 @@
                     storage: 30Gi
         spec:
           domain:
+            resources:
+              requests:
+                memory: "{{ vm_memory_request }}"
+                cpu: "{{ vm_cpu_request }}"
             devices:
               interfaces:
                 - name: default
@@ -42,4 +44,4 @@
           volumes:
             - name: rootdisk
               dataVolume:
-                name: rootdisk   
+                name: rootdisk
