@@ -9,9 +9,6 @@
           ansible.builtin.wait_for_connection:
             timeout: 300
 
-        - name: Ping VM
-          ansible.builtin.ping:
-
       rescue:
         - name: Create SNOW incident (on failure)
           servicenow.itsm.incident:
