@@ -1,6 +1,6 @@
 ---
 - name: Create a basic rhel vm
-  hosts: all
+  hosts: localhost
   gather_facts: false
 
   tasks:
@@ -108,3 +108,10 @@
           vm_ip: "{{ vm_ip }}"
           vm_namespace: "{{ vm_namespace }}"
         per_host: false
+
+    - name: Add VM to runtime inventory
+      ansible.builtin.add_host:
+        name: "{{ vm_name }}"
+        groups: new_vm
+        ansible_host: "{{ vm_ip }}"
+        ansible_user: cloud-user

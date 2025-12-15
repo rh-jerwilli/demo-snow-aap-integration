@@ -2,11 +2,6 @@
   hosts: new_vm
   gather_facts: true
   tasks:
-  
-    - name: Validate VM and open incident on failure
-  hosts: new_vm
-  gather_facts: false
-  tasks:
     - block:
         - ansible.builtin.wait_for_connection:
             timeout: 300
