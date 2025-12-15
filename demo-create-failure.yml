@@ -7,20 +7,25 @@
             timeout: 300
         - ansible.builtin.ping:
       rescue:
-        - servicenow.itsm.incident:
-            instance:
-              host: "{{ SN_HOST }}"
-              username: "{{ SN_USERNAME }}"
-              password: "{{ SN_PASSWORD }}"
-            short_description: "Demo: VM not reachable after provisioning: {{ vm_name }}"
-            description: |
-              VM provisioned but not reachable via SSH.
+        - name: Create SNOW incident (on failure)
+  servicenow.itsm.incident:
+    instance:
+      host: "{{ SN_HOST }}"
+      username: "{{ SN_USERNAME }}"
+      password: "{{ SN_PASSWORD }}"
+      validate_certs: true   # or false in dev if needed
+    state: new
+    caller: "{{ SN_USERNAME }}"
+    short_description: "Demo: Provision/validation failure for {{ vm_name }}"
+    description: |
+      Workflow failed after provisioning.
 
-              VM: {{ vm_name }}
-              Namespace: {{ vm_namespace }}
-              IP: {{ hostvars['localhost']['vm_ip'] | default('unknown') }}
-              AAP Job ID: {{ tower_job_id | default('unknown') }}
-            state: new
-          delegate_to: localhost
-        - ansible.builtin.fail:
-            msg: "Validation failed; incident created."
+      VM: {{ vm_name }}
+      Namespace: {{ vm_namespace }}
+      IP: {{ vm_ip | default('unknown') }}
+      AAP Job ID: {{ tower_job_id | default('unknown') }}
+      Error: {{ failure_reason | default('see job output') }}
+    impact: medium
+    urgency: medium
+  delegate_to: localhost
+  register: snow_incident
