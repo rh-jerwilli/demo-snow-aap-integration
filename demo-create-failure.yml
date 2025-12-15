@@ -1,53 +1,31 @@
 - name: Post-provision config and validation
-  hosts: "{{ vm_name }}"
+  hosts: new_vm
   gather_facts: true
   tasks:
-
+  
+    - name: Validate VM and open incident on failure
+  hosts: new_vm
+  gather_facts: false
+  tasks:
     - block:
-
-      - name: Install httpd
-        ansible.builtin.dnf:
-          name: httpd
-          state: present
-
-      - name: Start httpd
-        ansible.builtin.service:
-          name: httpd
-          state: started
-          enabled: true
-
-      - name: Intentional failure - require health endpoint
-        ansible.builtin.uri:
-          url: "http://{{ vm_name }}/healthz"
-          return_content: true
-          status_code: 200
-          timeout: 5
-
+        - ansible.builtin.wait_for_connection:
+            timeout: 300
+        - ansible.builtin.ping:
       rescue:
-        - name: Create incident in ServiceNow
-          servicenow.itsm.incident:
+        - servicenow.itsm.incident:
             instance:
               host: "{{ SN_HOST }}"
               username: "{{ SN_USERNAME }}"
               password: "{{ SN_PASSWORD }}"
-            short_description: "Demo: Post-provision validation failed for {{ vm_name }}"
+            short_description: "Demo: VM not reachable after provisioning: {{ vm_name }}"
             description: |
-              Provision succeeded but validation failed.
+              VM provisioned but not reachable via SSH.
 
               VM: {{ vm_name }}
-              IP: {{ vm_ip }}
               Namespace: {{ vm_namespace }}
+              IP: {{ hostvars['localhost']['vm_ip'] | default('unknown') }}
               AAP Job ID: {{ tower_job_id | default('unknown') }}
-
-              Failed task: {{ ansible_failed_task.name | default('unknown') }}
-              Error: {{ ansible_failed_result.msg | default(ansible_failed_result | to_nice_json) }}
-            impact: 2
-            urgency: 2
             state: new
-            assignment_group: "{{ snow_assignment_group | default(omit) }}"
-            assigned_to: "{{ snow_assigned_to | default(omit) }}"
           delegate_to: localhost
-
-        - name: Fail the play so the workflow shows failure
-          ansible.builtin.fail:
-            msg: "Validation failed; incident created in ServiceNow."
+        - ansible.builtin.fail:
+            msg: "Validation failed; incident created."
