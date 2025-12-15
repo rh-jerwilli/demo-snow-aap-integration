@@ -35,7 +35,7 @@
               Provision succeeded but validation failed.
 
               VM: {{ vm_name }}
-              IP: {{ ansible_host }}
+              IP: {{ vm_ip }}
               Namespace: {{ vm_namespace }}
               AAP Job ID: {{ tower_job_id | default('unknown') }}
 
