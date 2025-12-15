@@ -100,3 +100,11 @@
     - name: Show VM IP
       ansible.builtin.debug:
         msg: "VM {{ vm_name }} IP: {{ vm_ip }}"
+    
+    - name: Setting stats for further workflow if needed
+      ansible.builtin.set_stats:
+        data:
+          vm_name: "{{ vm_name }}"
+          vm_ip: "{{ vm_ip }}"
+          vm_namespace: "{{ vm_namespace }}"
+        per_host: false
