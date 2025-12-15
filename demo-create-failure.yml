@@ -1,3 +1,4 @@
+---
 - name: Post-provision config and validation
   hosts: new_vm
   gather_facts: true
