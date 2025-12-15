@@ -1,32 +1,45 @@
 ---
 - name: Post-provision config and validation
   hosts: new_vm
-  gather_facts: true
+  gather_facts: false
+
   tasks:
     - block:
-        - ansible.builtin.wait_for_connection:
+        - name: Wait for SSH
+          ansible.builtin.wait_for_connection:
             timeout: 300
-        - ansible.builtin.ping:
+
+        - name: Ping VM
+          ansible.builtin.ping:
+
       rescue:
         - name: Create SNOW incident (on failure)
-  servicenow.itsm.incident:
-    instance:
-      host: "{{ SN_HOST }}"
-      username: "{{ SN_USERNAME }}"
-      password: "{{ SN_PASSWORD }}"
-      validate_certs: true   # or false in dev if needed
-    state: new
-    caller: "{{ SN_USERNAME }}"
-    short_description: "Demo: Provision/validation failure for {{ vm_name }}"
-    description: |
-      Workflow failed after provisioning.
+          servicenow.itsm.incident:
+            instance:
+              host: "{{ SN_HOST }}"
+              username: "{{ SN_USERNAME }}"
+              password: "{{ SN_PASSWORD }}"
+              validate_certs: true
+            state: new
+            caller: "{{ SN_USERNAME }}" 
+            short_description: "Demo: Provision/validation failure for {{ vm_name }}"
+            description: |
+              Workflow failed after provisioning.
 
-      VM: {{ vm_name }}
-      Namespace: {{ vm_namespace }}
-      IP: {{ vm_ip | default('unknown') }}
-      AAP Job ID: {{ tower_job_id | default('unknown') }}
-      Error: {{ failure_reason | default('see job output') }}
-    impact: medium
-    urgency: medium
-  delegate_to: localhost
-  register: snow_incident
+              VM: {{ vm_name }}
+              Namespace: {{ vm_namespace }}
+              IP: {{ vm_ip | default('unknown') }}
+              AAP Job ID: {{ tower_job_id | default('unknown') }}
+              Error: {{ ansible_failed_result.msg | default('see job output') }}
+            impact: medium
+            urgency: medium
+          delegate_to: localhost
+          register: snow_incident
+
+        - name: Show incident result
+          ansible.builtin.debug:
+            var: snow_incident
+
+        - name: Fail the job so workflow shows red
+          ansible.builtin.fail:
+            msg: "Validation failed; incident created in ServiceNow."
