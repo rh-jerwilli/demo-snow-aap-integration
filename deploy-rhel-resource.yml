@@ -54,49 +54,49 @@
         namespace: "{{ vm_namespace }}"
         wait: true
 
-- name: Wait for VMI to be ready
-  redhat.openshift_virtualization.kubevirt_vmi_info:
-    name: "{{ vm_name }}"
-    namespace: "{{ vm_namespace }}"
-    wait: true
-    wait_timeout: 600
-    wait_sleep: 5
-  register: vmi_info
+    - name: Wait for VMI to be ready
+      redhat.openshift_virtualization.kubevirt_vmi_info:
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        wait: true
+        wait_timeout: 600
+        wait_sleep: 5
+      register: vmi_info
 
-- name: Extract VM IP from VMI
-  ansible.builtin.set_fact:
-    vm_ip: >-
-      {{
-        (
-          vmi_info.resources[0].status.interfaces
-          | default([])
-          | map(attribute='ipAddress')
-          | select('defined')
-          | list
-          | first
-        )
-        | default(
-          (
-            vmi_info.resources[0].status.interfaces
-            | default([])
-            | map(attribute='ipAddresses')
-            | select('defined')
-            | list
-            | first
-            | default([])
-            | first
-          ),
-          true
-        )
-      }}
+    - name: Extract VM IP from VMI
+      ansible.builtin.set_fact:
+        vm_ip: >-
+          {{
+            (
+              vmi_info.resources[0].status.interfaces
+              | default([])
+              | map(attribute='ipAddress')
+              | select('defined')
+              | list
+              | first
+            )
+            | default(
+              (
+                vmi_info.resources[0].status.interfaces
+                | default([])
+                | map(attribute='ipAddresses')
+                | select('defined')
+                | list
+                | first
+                | default([])
+                | first
+              ),
+              true
+            )
+          }}
 
-- name: Fail if no IP reported
-  ansible.builtin.fail:
-    msg: >-
-      VMI is ready but no IP was reported in status.interfaces. This usually means
-      the guest isn't reporting IP yet (guest-agent) or networking hasn't populated it.
-  when: vm_ip is not defined or vm_ip | length == 0
+    - name: Fail if no IP reported
+      ansible.builtin.fail:
+        msg: >-
+          VMI is ready but no IP was reported in status.interfaces. This usually means
+          the guest isn't reporting IP yet (guest-agent) or networking hasn't populated it.
+      when: vm_ip is not defined or vm_ip | length == 0
 
-- name: Show VM IP
-  ansible.builtin.debug:
-    msg: "VM {{ vm_name }} IP: {{ vm_ip }}"
+    - name: Show VM IP
+      ansible.builtin.debug:
+        msg: "VM {{ vm_name }} IP: {{ vm_ip }}"
