@@ -8,4 +8,4 @@
       redhat.openshift_virtualization.kubevirt_vm:
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        state: absent
+        state: "{{ vm_state }}"

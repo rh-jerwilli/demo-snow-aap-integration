@@ -1,0 +1,93 @@
+---
+- name: ServiceNow-triggered KubeVirt VM power state (This does not need to be through servicenow.)
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    # === AAP Survey / SN payload ===
+    ticket_number: "{{ ticket_number | default('') }}"            # optional correlation id (RITM/REQ/INC)
+    vm_name: "{{ vm_name }}"
+    vm_namespace: "{{ vm_namespace | default('default') }}"
+    desired_power_state: "{{ desired_power_state }}"              # powered_on | powered_off | restart
+
+    # === Wait behavior (optional but useful for DoD) ===
+    wait_for_ready: "{{ wait_for_ready }}"
+    wait_timeout: "{{ wait_timeout }}"
+    wait_sleep: "{{ wait_sleep }}"
+
+  tasks:
+    - name: Validate required inputs
+      ansible.builtin.assert:
+        that:
+          - vm_name | length > 0
+          - vm_namespace | length > 0
+          - desired_power_state in ['powered_on', 'powered_off', 'restart']
+        fail_msg: >-
+          Required: vm_name, vm_namespace, desired_power_state (powered_on|powered_off|restart).
+          Got vm_name='{{ vm_name | default("") }}', vm_namespace='{{ vm_namespace | default("") }}',
+          desired_power_state='{{ desired_power_state | default("") }}'
+
+    - name: Log request context (SN correlation)
+      ansible.builtin.debug:
+        msg:
+          - "ticket_number={{ ticket_number | default('N/A') }}"
+          - "vm={{ vm_namespace }}/{{ vm_name }}"
+          - "desired_power_state={{ desired_power_state }}"
+          - "wait_for_ready={{ wait_for_ready }}, timeout={{ wait_timeout }}, sleep={{ wait_sleep }}"
+
+    # --- POWER ON ---
+    - name: Power ON VM (running=true)
+      redhat.openshift_virtualization.kubevirt_vm:
+        state: present
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        running: true
+        wait: "{{ wait_for_ready }}"
+        wait_timeout: "{{ wait_timeout }}"
+        wait_sleep: "{{ wait_sleep }}"
+      when: desired_power_state == 'powered_on'
+
+    # --- POWER OFF ---
+    - name: Power OFF VM (running=false)
+      redhat.openshift_virtualization.kubevirt_vm:
+        state: present
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        running: false
+        wait: false
+      when: desired_power_state == 'powered_off'
+
+    # --- RESTART (simple stop/start) ---
+    - name: Stop VM (restart step 1)
+      redhat.openshift_virtualization.kubevirt_vm:
+        state: present
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        running: false
+        wait: false
+      when: desired_power_state == 'restart'
+
+    - name: Pause briefly (restart step 2)
+      ansible.builtin.pause:
+        seconds: 10
+      when: desired_power_state == 'restart'
+
+    - name: Start VM (restart step 3)
+      redhat.openshift_virtualization.kubevirt_vm:
+        state: present
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        running: true
+        wait: "{{ wait_for_ready }}"
+        wait_timeout: "{{ wait_timeout }}"
+        wait_sleep: "{{ wait_sleep }}"
+      when: desired_power_state == 'restart'
+
+# AAP Survey Vars
+# ticket_number (Text, optional)
+# vm_name (Text, required)
+# vm_namespace (Text, default workloads, required)
+# desired_power_state (Choice, required): powered_on, powered_off, restart
+# wait_for_ready (Choice/bool, default true) (optional)
+# wait_timeout (optional) (set default maybe?)
+# wait_sleep (Integer, default 5) (optional)
