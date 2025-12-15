@@ -10,7 +10,7 @@
         ansible_user: cloud-user
 - name: Post provision stuff
   hosts: new_vm
-  gather_facts: true
+  gather_facts: false
   tasks:
 
   - block:
