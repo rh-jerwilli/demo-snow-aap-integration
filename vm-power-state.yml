@@ -41,7 +41,7 @@
         state: present
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        running: true
+        run_stategy: always
         wait: "{{ wait_for_ready }}"
         wait_timeout: "{{ wait_timeout }}"
         wait_sleep: "{{ wait_sleep }}"
@@ -53,7 +53,7 @@
         state: present
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        running: false
+        run_strategy: halted
         wait: false
       when: desired_power_state == 'powered_off'
 
@@ -63,7 +63,7 @@
         state: present
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        running: false
+        run_strategy: halted
         wait: false
       when: desired_power_state == 'restart'
 
@@ -77,7 +77,7 @@
         state: present
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        running: true
+        run_strategy: Always
         wait: "{{ wait_for_ready }}"
         wait_timeout: "{{ wait_timeout }}"
         wait_sleep: "{{ wait_sleep }}"
@@ -89,5 +89,5 @@
 # vm_namespace (Text, default workloads, required)
 # desired_power_state (Choice, required): powered_on, powered_off, restart
 # wait_for_ready (Choice/bool, default true) (optional)
-# wait_timeout (optional) (set default maybe?)
+# wait_timeout (Integer, default 20) (optional)
 # wait_sleep (Integer, default 5) (optional)
