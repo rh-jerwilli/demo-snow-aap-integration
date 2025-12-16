@@ -41,7 +41,7 @@
         state: present
         name: "{{ vm_name }}"
         namespace: "{{ vm_namespace }}"
-        run_stategy: Always
+        run_strategy: Always
         wait: "{{ wait_for_ready }}"
         wait_timeout: "{{ wait_timeout }}"
         wait_sleep: "{{ wait_sleep }}"
