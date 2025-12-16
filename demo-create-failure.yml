@@ -16,7 +16,7 @@
   - block:
       - name: Wait for SSH
         ansible.builtin.wait_for_connection:
-          timeout: 300
+          timeout: 15
 
     rescue:
       - name: Create SNOW incident (on failure)
