@@ -1,0 +1,114 @@
+---
+- name: Create a basic rhel vm
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Create VM on OpenShift Virtualization
+      redhat.openshift_virtualization.kubevirt_vm:
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        labels:
+          app: "{{ vm_app_label }}"
+        data_volume_templates:
+          - metadata:
+              name: rootdisk
+            spec:
+              sourceRef:
+                kind: DataSource
+                name: "{{ vm_preference_os }}"
+                namespace: "{{ vm_custom_template_namespace }}"
+              storage:
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: "{{ vm_storage_request }}"
+        spec:
+          domain:
+            resources:
+              requests:
+                memory: "{{ vm_memory_request }}"
+                cpu: "{{ vm_cpu_request }}"
+            devices:
+              interfaces:
+                - name: default
+                  masquerade: {}
+              disks:
+                - name: rootdisk
+                  disk:
+                    bus: virtio
+          networks:
+            - name: default
+              pod: {}
+          volumes:
+            - name: rootdisk
+              dataVolume:
+                name: rootdisk
+        running: true
+        wait: true
+
+    - name: Wait for VMI to be ready
+      redhat.openshift_virtualization.kubevirt_vmi_info:
+        name: "{{ vm_name }}"
+        namespace: "{{ vm_namespace }}"
+        wait: true
+        wait_timeout: 600
+        wait_sleep: 5
+      register: vmi_info
+
+    - name: Extract VM IP from VMI
+      ansible.builtin.set_fact:
+        vm_ip: >-
+          {{
+            (
+              vmi_info.resources[0].status.interfaces
+              | default([])
+              | map(attribute='ipAddress')
+              | select('defined')
+              | list
+              | first
+            )
+            | default(
+              (
+                vmi_info.resources[0].status.interfaces
+                | default([])
+                | map(attribute='ipAddresses')
+                | select('defined')
+                | list
+                | first
+                | default([])
+                | first
+              ),
+              true
+            )
+          }}
+
+    - name: Fail if no IP reported
+      ansible.builtin.fail:
+        msg: >-
+          VMI is ready but no IP was reported in status.interfaces. This usually means
+          the guest isn't reporting IP yet (guest-agent) or networking hasn't populated it.
+      when: vm_ip is not defined or vm_ip | length == 0
+
+    - name: Show VM IP
+      ansible.builtin.debug:
+        msg: "VM {{ vm_name }} IP: {{ vm_ip }}"
+
+    - name: Setting stats for further workflow if needed
+      ansible.builtin.set_stats:
+        data:
+          vm_name: "{{ vm_name }}"
+          vm_ip: "{{ vm_ip }}"
+          vm_namespace: "{{ vm_namespace }}"
+        per_host: false
+
+# vm_name - (text , required)
+# vm_namespace - (text, required)
+# vm_ip - (artifact, not surveyed)
+# vm_storage_request - (text, required, default - "30Gi")
+# vm_app_label (text, required, default - "testing")
+# vm_cpu_request (integer, required, default - "2")
+# vm_preference_os (text, required, default - "rhel9")
+# vm_memory_request (text, required, default - "4Gi")
+# vm_custom_template_namespace - (text, required, default-"openshift-virtualization-os-images")
