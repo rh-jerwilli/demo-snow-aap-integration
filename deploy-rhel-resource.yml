@@ -17,13 +17,13 @@
               sourceRef:
                 kind: DataSource
                 name: "{{ vm_preference_os }}"
-                namespace: openshift-virtualization-os-images
+                namespace: "{{ vm_custom_template_namespace }}"
               storage:
                 accessModes:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 30Gi
+                    storage: "{{ vm_storage_request }}"
         spec:
           domain:
             resources:
@@ -46,12 +46,6 @@
               dataVolume:
                 name: rootdisk
         running: true
-        wait: true
-
-    - name: Wait until the VirtualMachine is running
-      redhat.openshift_virtualization.kubevirt_vm_info:
-        name: "{{ vm_name }}"
-        namespace: "{{ vm_namespace }}"
         wait: true
 
     - name: Wait for VMI to be ready
@@ -109,9 +103,12 @@
           vm_namespace: "{{ vm_namespace }}"
         per_host: false
 
-    - name: Add VM to runtime inventory
-      ansible.builtin.add_host:
-        name: "{{ vm_name }}"
-        groups: new_vm
-        ansible_host: "{{ vm_ip }}"
-        ansible_user: cloud-user
+# vm_name - (text , required)
+# vm_namespace - (text, required)
+# vm_ip - (artifact, not surveyed)
+# vm_storage_request - (text, required, default - "30Gi")
+# vm_app_label (text, required, default - "testing")
+# vm_cpu_request (integer, required, default - "2")
+# vm_preference_os (text, required, default - "rhel9")
+# vm_memory_request (text, required, default - "4Gi")
+# vm_custom_template_namespace - (text, required, default-"openshift-virtualization-os-images")
