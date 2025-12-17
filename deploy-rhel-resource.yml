@@ -100,7 +100,7 @@
     - name: Show VM IP
       ansible.builtin.debug:
         msg: "VM {{ vm_name }} IP: {{ vm_ip }}"
-    
+
     - name: Setting stats for further workflow if needed
       ansible.builtin.set_stats:
         data:

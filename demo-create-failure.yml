@@ -3,20 +3,22 @@
   hosts: localhost
   gather_facts: false
   tasks:
+
     - ansible.builtin.add_host:
         name: "{{ vm_name }}"
         groups: new_vm
         ansible_host: "{{ vm_ip }}"
         ansible_user: cloud-user
+
 - name: Post provision stuff
   hosts: new_vm
   gather_facts: false
   tasks:
 
   - block:
-      - name: Wait for SSH
-        ansible.builtin.wait_for_connection:
-          timeout: 15
+    - name: Wait for SSH
+      ansible.builtin.wait_for_connection:
+        timeout: 15
 
     rescue:
       - name: Create SNOW incident (on failure)
@@ -27,7 +29,7 @@
             password: "{{ SN_PASSWORD }}"
             validate_certs: true
           state: new
-          caller: "{{ SN_USERNAME }}" 
+          caller: "{{ SN_USERNAME }}"
           short_description: "Demo: Provision/validation failure for {{ vm_name }}"
           description: |
             Workflow failed after provisioning.
